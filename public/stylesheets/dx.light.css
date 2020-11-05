@@ -1343,7 +1343,8 @@
   }
   .dx-field-value-static,
   .dx-field-value:not(.dx-switch):not(.dx-checkbox):not(.dx-button) {
-    width: 60%;
+    /* width: 60%; */
+    width: 90%;
   }
   .dx-field {
     color: #333;

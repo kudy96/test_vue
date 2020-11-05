@@ -629,14 +629,16 @@
 }
 .dx-field-label {
   float: left;
-  width: 40%;
+  /* width: 40%; */
+  width: 10%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .dx-field-value,
 .dx-field-value-static {
-  float: right;
+  /* float: right; */
+  float: left;
 }
 .dx-field-value-static {
   white-space: normal;

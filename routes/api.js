@@ -14,15 +14,56 @@ const config = {
             //     "encrypt" : false
             // }
         "user"      : "sa",
-        "password"  : "qw12qw12)",
-        "server"    : "yurimsys.iptime.org",
-        "port"      : 14331,
-        "database"  : "YR_SIGNAGE",
-        "timezone"  : 'utc',
+        "password"  : "qw12qw12",
+        "server"    : "192.168.0.135",
+        "port"      : 1433,
+        "database"  : "BD_TEST",
+        // "timezone"  : 'utc',
         "options"   : {
-            "encrypt" : false
+            encrypt: false, // Use this if you're on Windows Azure 
+            enableArithAbort: true
     }
 }
+
+// 일반적으로 사용하는 쿼리 사용 방법
+router.get('/callData', function(req, res, next) {
+    try {
+
+        console.log('callData');
+
+        mssql.connect(config, function (err) {
+
+            console.log('Connect');
+            var request = new mssql.Request();
+
+            var queryString = "Exec p_BM";
+
+            request.query(queryString, function (err, recordset) {
+        
+                res.json({data : recordset.recordset} );
+                //console.log(recordset.recordset)
+                //res.render()
+            });
+        
+        
+            
+
+            // request.input('p_Parameter', sql.NVARCHAR(sql.MAX), '|||ExecTy       ===gvvA|||E_IDs        ===E0000001|||asas         ===  |||');
+        
+            // request.execute('p__PT_FA', function (err, recordsets, returnValue) {
+
+            //     res.json(
+            //         { data : recordsets }
+            //     );
+            // });
+        });
+    } catch (err) {
+        alert(err);
+        //console.log('error fire')
+    }
+    // res.render('index', { title: 'Express' });
+
+});
 
 
 //데이터 불러오기
