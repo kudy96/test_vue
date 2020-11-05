@@ -69,10 +69,10 @@
         <div class="options"></div>
         
         <div id="tree-list-demo">
-            <div id="employees"></div>
+            <div id="bm_tree"></div>
         </div>
 
-        <div class="options">
+        <!-- <div class="options">
             <div class="caption">Options</div>
             <div class="option">
                 <div id="allowDropInside"></div>
@@ -83,29 +83,12 @@
             <div class="option">
                 <div id="dragIcons"></div>
             </div>
-        </div>
+        </div> -->
     </div>
 </body>
 <script>
 
-
-$(function() {
-    $("#title").dxTextBox({
-        disabled: false
-    });
-    
-    $("#name").dxTextBox({
-        disabled: false
-    });
-    
-    $("#validate").dxButton({
-        text: "Save",
-        type: "default",
-        onClick: function (e) {
-           
-        }
-    });
-
+function BindData(tableId, pages, rowcounts){
 
     $.ajax({
         type: 'GET',
@@ -114,7 +97,7 @@ $(function() {
         dataType: "json"
         ,success: function(respnse) {
             // respnse.data
-            var treeList = $("#employees").dxTreeList({
+            var treeList = $("#bm_tree").dxTreeList({
                 dataSource: respnse.data,
                 rootValue: 0,
                 keyExpr: "c_BM_IDs",
@@ -142,8 +125,8 @@ $(function() {
                         if (e.dropInsideItem) {
                             e.itemData.c_BM_UpIDs = targetData.c_BM_IDs;
                         } else {
-                            var sourceIndex = employees.indexOf(sourceData),
-                                targetIndex = employees.indexOf(targetData);
+                            var sourceIndex = bm_tree.indexOf(sourceData),
+                                targetIndex = bm_tree.indexOf(targetData);
 
                             if (sourceData.c_BM_UpIDs !== targetData.c_BM_UpIDs) {
                                 sourceData.c_BM_UpIDs = targetData.c_BM_UpIDs;
@@ -152,8 +135,8 @@ $(function() {
                                 }
                             }
 
-                            employees.splice(sourceIndex, 1);
-                            employees.splice(targetIndex, 0, sourceData);
+                            bm_tree.splice(sourceIndex, 1);
+                            bm_tree.splice(targetIndex, 0, sourceData);
                         }
 
                         e.component.refresh();
@@ -168,30 +151,50 @@ $(function() {
             }).dxTreeList("instance");
         }
     });
+}
 
-    $("#allowDropInside").dxCheckBox({
-        text: "Allow Drop Inside Item",
-        value: true,
-        onValueChanged: function(e) {
-            treeList.option("rowDragging.allowDropInsideItem", e.value);
+$(function() {
+    $("#title").dxTextBox({
+        disabled: false
+    });
+    
+    $("#name").dxTextBox({
+        disabled: false
+    });
+    
+    $("#validate").dxButton({
+        text: "새글만들기",
+        type: "default",
+        onClick: function (e) {
+            BindData();
         }
     });
 
-    $("#allowReordering").dxCheckBox({
-        text: "Allow Reordering",
-        value: true,
-        onValueChanged: function(e) {
-            treeList.option("rowDragging.allowReordering", e.value);
-        }
-    });
+    BindData();
 
-    $("#dragIcons").dxCheckBox({
-        text: "Show Drag Icons",
-        value: true,
-        onValueChanged: function(e) {
-            treeList.option("rowDragging.showDragIcons", e.value);
-        }
-    });
+    // $("#allowDropInside").dxCheckBox({
+    //     text: "Allow Drop Inside Item",
+    //     value: true,
+    //     onValueChanged: function(e) {
+    //         treeList.option("rowDragging.allowDropInsideItem", e.value);
+    //     }
+    // });
+
+    // $("#allowReordering").dxCheckBox({
+    //     text: "Allow Reordering",
+    //     value: true,
+    //     onValueChanged: function(e) {
+    //         treeList.option("rowDragging.allowReordering", e.value);
+    //     }
+    // });
+
+    // $("#dragIcons").dxCheckBox({
+    //     text: "Show Drag Icons",
+    //     value: true,
+    //     onValueChanged: function(e) {
+    //         treeList.option("rowDragging.showDragIcons", e.value);
+    //     }
+    // });
 
 
 
