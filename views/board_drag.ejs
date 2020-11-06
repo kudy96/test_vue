@@ -59,7 +59,8 @@
                 </div>    
             </div>
 
-            <div id="validate" class="validate"></div>
+            <div id="btnNew" class="validate"></div>
+            <div id="btnChildNew" class="validate"></div>
 
             <div class="options"></div>
             
@@ -130,8 +131,8 @@
                                 if (e.dropInsideItem) {
                                     e.itemData.c_BM_UpIDs = targetData.c_BM_IDs;
                                 } else {
-                                    var sourceIndex = bm_tree.indexOf(sourceData),
-                                        targetIndex = bm_tree.indexOf(targetData);
+                                    var sourceIndex = respnse.data.indexOf(sourceData),
+                                        targetIndex = respnse.data.indexOf(targetData);
 
                                     if (sourceData.c_BM_UpIDs !== targetData.c_BM_UpIDs) {
                                         sourceData.c_BM_UpIDs = targetData.c_BM_UpIDs;
@@ -140,8 +141,8 @@
                                         }
                                     }
 
-                                    bm_tree.splice(sourceIndex, 1);
-                                    bm_tree.splice(targetIndex, 0, sourceData);
+                                    respnse.data.splice(sourceIndex, 1);
+                                    respnse.data.splice(targetIndex, 0, sourceData);
                                 }
 
                                 e.component.refresh();
@@ -232,8 +233,30 @@
                 disabled: false
             });
             
-            $("#validate").dxButton({
-                text: "글만들기",
+            $("#btnNew").dxButton({
+                text: "새글 만들기",
+                type: "default",
+                onClick: function (e) {
+
+                    //alert($("#bm_tree").dxTreeList.selectedRowKeys);
+
+                    // all 로 해도 Single이니까 상관없다.
+                    // var upIds = $("#bm_tree").dxTreeList("instance").getSelectedRowKeys("all");
+                    
+                    // if(upIds == "") {
+                    //     upIds = 0;
+                    // } else {}
+
+                    AddBoard(0, $('#title').dxTextBox('instance').option('value'));
+
+                    //alert(upIds);
+
+                    // var tree = $("#bm_tree").dxTreeList("instance");  
+                }
+            });
+
+            $("#btnChildNew").dxButton({
+                text: "리플 만들기",
                 type: "default",
                 onClick: function (e) {
 
@@ -243,9 +266,10 @@
                     var upIds = $("#bm_tree").dxTreeList("instance").getSelectedRowKeys("all");
                     
                     if(upIds == "") {
-                        upIds = 0;
+                        alert("부모가 될 게시글을 선택해주세요.");
+                        return;
                     } else {}
-                    
+
                     AddBoard(upIds, $('#title').dxTextBox('instance').option('value'));
 
                     //alert(upIds);
