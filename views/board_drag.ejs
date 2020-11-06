@@ -1,203 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- DevExtreme themes -->
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- DevExtreme themes -->
+        <link rel="stylesheet" href="\stylesheets\dx.common.css">
+        <link rel="stylesheet" href="\stylesheets\dx.light.css">
+
+        <title>Document</title>
+        <style>
+            #employees {
+                max-height: 440px;
+            }
+
+            .dx-sortable-dragging {
+                opacity: 0.9
+            }
+
+            .options {
+                margin-top: 20px;
+                padding: 20px;
+                background-color: rgba(191, 191, 191, 0.15);
+                position: relative;
+            }
+
+            .caption {
+                font-size: 18px;
+                font-weight: 500;
+            }
+
+            .option {
+            margin-top: 10px;
+            margin-right: 40px;
+            display: inline-block;
+            }
+
+            .option:last-child {
+                margin-right: 0;
+            }
+        </style>
+    </head>
+    <body class="dx-viewport">
+        <div class="demo-container">
+            <div class="form">
+                <div class="dx-fieldset">    
+                    <div class="dx-field">
+                        <div class="dx-field-label">제목</div>
+                        <div class="dx-field-value">
+                            <div id="title"></div>
+                        </div>
+                    </div>    
+                    <div class="dx-field">
+                        <div class="dx-field-label">이름</div>
+                        <div class="dx-field-value">
+                            <div id="name"></div>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+
+            <div id="validate" class="validate"></div>
+
+            <div class="options"></div>
+            
+            <div id="tree-list-demo">
+                <div id="bm_tree"></div>
+            </div>
+
+            <!-- <div class="options">
+                <div class="caption">Options</div>
+                <div class="option">
+                    <div id="allowDropInside"></div>
+                </div>
+                <div class="option">
+                    <div id="allowReordering"></div>
+                </div>
+                <div class="option">
+                    <div id="dragIcons"></div>
+                </div>
+            </div> -->
+        </div>
+    </body>
+
+
+
+        
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <link rel="stylesheet" href="\stylesheets\dx.common.css">
-    <link rel="stylesheet" href="\stylesheets\dx.light.css">
-    
     <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.6/quill.min.js"></script> -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.6/quill.min.js"></script>
     <!-- DevExtreme library -->
     <script type="text/javascript" src="/javascripts/dx.all.js"></script>
-    <title>Document</title>
-    <style>
-        #employees {
-            max-height: 440px;
-        }
 
-        .dx-sortable-dragging {
-            opacity: 0.9
-        }
+    <script>
 
-        .options {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: rgba(191, 191, 191, 0.15);
-            position: relative;
-        }
+        function BindData(){
 
-        .caption {
-            font-size: 18px;
-            font-weight: 500;
-        }
+            $.ajax({
+                type: 'GET',
+                url: '/api/callData',
+                //  + '?page=' + pages + '&rowCount=' + rowcounts,
+                dataType: "json"
+                ,success: function(respnse) {
+                    // respnse.data
+                    var treeList = $("#bm_tree").dxTreeList({
+                        dataSource: respnse.data,
+                        rootValue: 0,
+                        keyExpr: "c_BM_IDs",
+                        rowDragging: {
+                            allowDropInsideItem: true,
+                            allowReordering: true,
+                            onDragChange: function(e) {
+                                var visibleRows = treeList.getVisibleRows(),
+                                    sourceNode = treeList.getNodeByKey(e.itemData.c_BM_IDs),
+                                    targetNode = visibleRows[e.toIndex].node;
 
-        .option {
-        margin-top: 10px;
-        margin-right: 40px;
-        display: inline-block;
-        }
-
-        .option:last-child {
-            margin-right: 0;
-        }
-    </style>
-</head>
-<body class="dx-viewport">
-    <div class="demo-container">
-        <div class="form">
-            <div class="dx-fieldset">    
-                <div class="dx-field">
-                    <div class="dx-field-label">제목</div>
-                    <div class="dx-field-value">
-                        <div id="title"></div>
-                    </div>
-                </div>    
-                <div class="dx-field">
-                    <div class="dx-field-label">이름</div>
-                    <div class="dx-field-value">
-                        <div id="name"></div>
-                    </div>
-                </div>
-            </div>    
-        </div>
-
-        <div id="validate" class="validate"></div>
-
-        <div class="options"></div>
-        
-        <div id="tree-list-demo">
-            <div id="bm_tree"></div>
-        </div>
-
-        <!-- <div class="options">
-            <div class="caption">Options</div>
-            <div class="option">
-                <div id="allowDropInside"></div>
-            </div>
-            <div class="option">
-                <div id="allowReordering"></div>
-            </div>
-            <div class="option">
-                <div id="dragIcons"></div>
-            </div>
-        </div> -->
-    </div>
-</body>
-<script>
-
-function BindData(tableId, pages, rowcounts){
-
-    $.ajax({
-        type: 'GET',
-        url: '/api/callData',
-        //  + '?page=' + pages + '&rowCount=' + rowcounts,
-        dataType: "json"
-        ,success: function(respnse) {
-            // respnse.data
-            var treeList = $("#bm_tree").dxTreeList({
-                dataSource: respnse.data,
-                rootValue: 0,
-                keyExpr: "c_BM_IDs",
-                rowDragging: {
-                    allowDropInsideItem: true,
-                    allowReordering: true,
-                    onDragChange: function(e) {
-                        var visibleRows = treeList.getVisibleRows(),
-                            sourceNode = treeList.getNodeByKey(e.itemData.c_BM_IDs),
-                            targetNode = visibleRows[e.toIndex].node;
-
-                        while (targetNode && targetNode.data) {
-                            if (targetNode.data.c_BM_IDs === sourceNode.data.c_BM_IDs) {
-                                e.cancel = true;
-                                break;
-                            }
-                            targetNode = targetNode.parent;
-                        }
-                    },
-                    onReorder: function(e) {
-                        var visibleRows = e.component.getVisibleRows(),
-                            sourceData = e.itemData,
-                            targetData = visibleRows[e.toIndex].data;
-
-                        if (e.dropInsideItem) {
-                            e.itemData.c_BM_UpIDs = targetData.c_BM_IDs;
-                        } else {
-                            var sourceIndex = bm_tree.indexOf(sourceData),
-                                targetIndex = bm_tree.indexOf(targetData);
-
-                            if (sourceData.c_BM_UpIDs !== targetData.c_BM_UpIDs) {
-                                sourceData.c_BM_UpIDs = targetData.c_BM_UpIDs;
-                                if (e.toIndex > e.fromIndex) {
-                                    targetIndex++;
+                                while (targetNode && targetNode.data) {
+                                    if (targetNode.data.c_BM_IDs === sourceNode.data.c_BM_IDs) {
+                                        e.cancel = true;
+                                        break;
+                                    }
+                                    targetNode = targetNode.parent;
                                 }
+                            },
+                            onReorder: function(e) {
+                                var visibleRows = e.component.getVisibleRows(),
+                                    sourceData = e.itemData,
+                                    targetData = visibleRows[e.toIndex].data;
+
+                                if (e.dropInsideItem) {
+                                    e.itemData.c_BM_UpIDs = targetData.c_BM_IDs;
+                                } else {
+                                    var sourceIndex = bm_tree.indexOf(sourceData),
+                                        targetIndex = bm_tree.indexOf(targetData);
+
+                                    if (sourceData.c_BM_UpIDs !== targetData.c_BM_UpIDs) {
+                                        sourceData.c_BM_UpIDs = targetData.c_BM_UpIDs;
+                                        if (e.toIndex > e.fromIndex) {
+                                            targetIndex++;
+                                        }
+                                    }
+
+                                    bm_tree.splice(sourceIndex, 1);
+                                    bm_tree.splice(targetIndex, 0, sourceData);
+                                }
+
+                                e.component.refresh();
                             }
+                        },
+                        parentIdExpr: "c_BM_UpIDs",
+                        columns: [
+                                    "c_BM_IDs", 
+                                    "c_Grp_M_IDs",
+                                    "c_BM_UpIDs", 
+                                    {
+                                        dataField: "c_BM_LoIDs",
+                                        caption: "c_BM_LoIDs",
+                                        selectedFilterOperation: "contains"
+                                    }, 
+                                    "c_Lv", 
+                                    {
+                                        dataField: "c_BM_Name",
+                                        caption: "c_BM_Name",
+                                        selectedFilterOperation: "contains"
+                                    },
+                                    "c_Sort_BM_IDs", 
+                                    "c_BM_Name"
+                                ],
+                        expandedRowKeys: [1],
+                        filterRow: {
+                            visible: true,
+                            applyFilter: "auto"
+                        },
+                        selection: {
+                            mode: "single" // or "multiple" | "none"
+                        },
+                        autoExpandAll:true,
+                        showRowLines: true,
+                        showBorders: true,
+                        // DevExtreme DxTreeList는 페이징을 지원하지 않음
+                        // paging: {
+                        //     enabled: true,
+                        //     pageSize: 10,
+                        //     pageIndex: 0    // Shows the second page
+                        // },
+                        // pager: {
+                        //     showPageSizeSelector: true,
+                        //     allowedPageSizes: [10, 20, 50],
+                        //     showNavigationButtons: true
+                        // },
+                        columnAutoWidth: true
+                    }).dxTreeList("instance");
+                    
+                    // $("#bm_tree").dxTreeList("instance").expandAll();
 
-                            bm_tree.splice(sourceIndex, 1);
-                            bm_tree.splice(targetIndex, 0, sourceData);
-                        }
-
-                        e.component.refresh();
-                    }
-                },
-                parentIdExpr: "c_BM_UpIDs",
-                columns: ["c_BM_IDs", "c_Grp_M_IDs", "c_BM_UpIDs", "c_BM_LoIDs", "c_Lv", "c_BM_Name", "c_Sort_BM_IDs", "c_BM_Name"],
-                expandedRowKeys: [1],
-                showRowLines: true,
-                showBorders: true,
-                columnAutoWidth: true
-            }).dxTreeList("instance");
+                }
+            });
         }
-    });
-}
 
-$(function() {
-    $("#title").dxTextBox({
-        disabled: false
-    });
-    
-    $("#name").dxTextBox({
-        disabled: false
-    });
-    
-    $("#validate").dxButton({
-        text: "새글만들기",
-        type: "default",
-        onClick: function (e) {
+        // 20.11.06 us.Kim
+        // 메소드 하나로 묶는법 찾아볼 것
+        // 이미 만들어져 있는 상태에서는 auto Expand 가 안되서 삭제하고 다시 만들어 줘야 하는데
+        // dxTreeList 가 있는지 없는지를 확인해야 함 
+        // 이렇게 구현한건 코드 중복을 줄이기 위해서
+        // 다음과 같은 경우 Ajax 실패 시 데이터가 아예 안보이게 됨 ( 이전것도 사라짐 )
+        function RefreshData(){
+
+            $("#bm_tree").dxTreeList("dispose");
+
             BindData();
         }
-    });
 
-    BindData();
+        function AddBoard(upIDs, title) {
+            $.ajax({
+                type: 'POST',
+                url: '/api/addData',
+                data: {pUpIDs:upIDs,pTitle:title},
+                //  + '?page=' + pages + '&rowCount=' + rowcounts,
+                dataType: "json"
+                ,success: function(respnse) {
+                    RefreshData();
+                }
+            });
+        }
 
-    // $("#allowDropInside").dxCheckBox({
-    //     text: "Allow Drop Inside Item",
-    //     value: true,
-    //     onValueChanged: function(e) {
-    //         treeList.option("rowDragging.allowDropInsideItem", e.value);
-    //     }
-    // });
+        $(function() {
+            $("#title").dxTextBox({
+                disabled: false
+            });
+            
+            $("#name").dxTextBox({
+                disabled: false
+            });
+            
+            $("#validate").dxButton({
+                text: "글만들기",
+                type: "default",
+                onClick: function (e) {
 
-    // $("#allowReordering").dxCheckBox({
-    //     text: "Allow Reordering",
-    //     value: true,
-    //     onValueChanged: function(e) {
-    //         treeList.option("rowDragging.allowReordering", e.value);
-    //     }
-    // });
+                    //alert($("#bm_tree").dxTreeList.selectedRowKeys);
 
-    // $("#dragIcons").dxCheckBox({
-    //     text: "Show Drag Icons",
-    //     value: true,
-    //     onValueChanged: function(e) {
-    //         treeList.option("rowDragging.showDragIcons", e.value);
-    //     }
-    // });
+                    // all 로 해도 Single이니까 상관없다.
+                    var upIds = $("#bm_tree").dxTreeList("instance").getSelectedRowKeys("all");
+                    
+                    if(upIds == "") {
+                        upIds = 0;
+                    } else {}
+                    
+                    AddBoard(upIds, $('#title').dxTextBox('instance').option('value'));
+
+                    //alert(upIds);
+
+                    // var tree = $("#bm_tree").dxTreeList("instance");  
+                }
+            });
+
+
+            // onLoad에서 사용하는것과 같은 동작
+            BindData();
+
+            // $("#allowDropInside").dxCheckBox({
+            //     text: "Allow Drop Inside Item",
+            //     value: true,
+            //     onValueChanged: function(e) {
+            //         treeList.option("rowDragging.allowDropInsideItem", e.value);
+            //     }
+            // });
+
+            // $("#allowReordering").dxCheckBox({
+            //     text: "Allow Reordering",
+            //     value: true,
+            //     onValueChanged: function(e) {
+            //         treeList.option("rowDragging.allowReordering", e.value);
+            //     }
+            // });
+
+            // $("#dragIcons").dxCheckBox({
+            //     text: "Show Drag Icons",
+            //     value: true,
+            //     onValueChanged: function(e) {
+            //         treeList.option("rowDragging.showDragIcons", e.value);
+            //     }
+            // });
 
 
 
-});
-</script>
+        });
+    </script>
 </html>

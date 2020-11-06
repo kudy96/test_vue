@@ -65,6 +65,49 @@ router.get('/callData', function(req, res, next) {
 
 });
 
+router.post('/addData', function(req, res, next) {
+    try {
+
+        console.log('addData');
+
+        mssql.connect(config, function (err) {
+
+            console.log('Connect');
+            var request = new mssql.Request();
+
+            console.log(req.body);
+            var queryString = "Exec p_BM_CUD " + req.body.pUpIDs + ", '" + req.body.pTitle + "'";
+
+            // 
+
+            request.query(queryString, function (err, recordset) {
+        
+                //console.log(recordset.recordset)
+                //res.render()
+                
+                res.json({data : 'OK'} );
+            });
+        
+        
+            
+
+            // request.input('p_Parameter', sql.NVARCHAR(sql.MAX), '|||ExecTy       ===gvvA|||E_IDs        ===E0000001|||asas         ===  |||');
+        
+            // request.execute('p__PT_FA', function (err, recordsets, returnValue) {
+
+            //     res.json(
+            //         { data : recordsets }
+            //     );
+            // });
+        });
+    } catch (err) {
+        alert(err);
+        //console.log('error fire')
+    }
+    // res.render('index', { title: 'Express' });
+
+});
+
 
 //데이터 불러오기
 router.get('/board', async function(req, res){
