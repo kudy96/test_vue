@@ -153,6 +153,7 @@
                                     sourceData = e.itemData,
                                     targetData = visibleRows[e.toIndex].data;
 
+                                    //console.log(" org id : " + sourceData.orgLoIDs);
                                 if (e.dropInsideItem) {
                                     // 부모가 없다가 있는 경우, 즉 누군가의 하위로 들어가는 경우
                                     e.itemData.c_BM_UpIDs = targetData.c_BM_IDs;
@@ -267,8 +268,9 @@
                                         caption: "c_BM_Name",
                                         selectedFilterOperation: "contains"
                                     },
-                                    "c_Sort_BM_IDs", 
-                                    "c_BM_Name"
+                                    "c_Sort_BM_IDs",
+                                    "orgUpIDs",
+                                    "orgLoIDs"
                                 ],
                         expandedRowKeys: [1],
                         filterRow: {
