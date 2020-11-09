@@ -1,3 +1,4 @@
+const { EditCommandRequest } = require('devexpress-richedit/lib/core/model/json/command-request');
 var express = require('express');
 var router = express.Router();
 const mssql = require('mssql');
@@ -108,6 +109,60 @@ router.post('/addData', function(req, res, next) {
 
 });
 
+
+router.post('/updateData', function(req, res, next) {
+    try {
+
+        console.log('updateData');
+
+        mssql.connect(config, function (err) {
+
+            console.log('Connect');
+            var request = new mssql.Request();
+
+            console.log(JSON.parse(req.body.data));
+            //console.log(JSON.parse(req.body.data));
+
+            var updateObj = JSON.parse(req.body.data);
+
+            console.log(updateObj.length);
+
+            var queryString = "";
+
+            for(i=0; i<updateObj.length; i++) {
+                console.log(updateObj[i].c_BM_IDs);
+                console.log(updateObj[i].c_BM_UpIDs);
+                console.log(updateObj[i].c_BM_LoIDs);
+
+                queryString += "UPDATE tBM SET BM_UpIDs = " + updateObj[i].c_BM_UpIDs + ", BM_LoIDs = " + updateObj[i].c_BM_LoIDs 
+                queryString += " WHERE BM_i = " + updateObj[i].c_BM_IDs
+                queryString += ";";
+            }
+
+            request.query(queryString, function (err, recordset) {
+        
+                //console.log(recordset.recordset)
+                //res.render()
+                
+                res.json({data : 'OK'} );
+            });
+
+            // request.input('p_Parameter', sql.NVARCHAR(sql.MAX), '|||ExecTy       ===gvvA|||E_IDs        ===E0000001|||asas         ===  |||');
+        
+            // request.execute('p__PT_FA', function (err, recordsets, returnValue) {
+
+            //     res.json(
+            //         { data : recordsets }
+            //     );
+            // });
+        });
+    } catch (err) {
+        alert(err);
+        //console.log('error fire')
+    }
+    // res.render('index', { title: 'Express' });
+
+});
 
 //데이터 불러오기
 router.get('/board', async function(req, res){

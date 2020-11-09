@@ -101,16 +101,34 @@
                 url: '/api/callData',
                 //  + '?page=' + pages + '&rowCount=' + rowcounts,
                 dataType: "json"
-                ,success: function(respnse) {
+                ,success: function(response) {
                     // respnse.data
                     var treeList = $("#bm_tree").dxTreeList({
-                        dataSource: respnse.data,
+
+                        // DevExtreme DxTreeList는 페이징을 지원하지 않음??
+                        // 지원하는것으로 보여지는데 적용이 안됨
+                        // 위쪽에 적용해야 적용되는것인지 확인 필요
+                        
+                        // 현재 적용 안됨
+                        // paging: {
+                        //     enabled: true,
+                        //     pageSize: 10
+                        // },
+                        // pager: {
+                        //     showPageSizeSelector: true,
+                        //     allowedPageSizes: [10, 20, 50],
+                        //     showNavigationButtons: true
+                        // },
+                        dataSource: response.data,
                         rootValue: 0,
                         keyExpr: "c_BM_IDs",
                         rowDragging: {
                             allowDropInsideItem: true,
                             allowReordering: true,
                             onDragChange: function(e) {
+                                // 이동할 내역을 붙잡고 이동시 계속 발생
+                                console.log('onDragChange');
+
                                 var visibleRows = treeList.getVisibleRows(),
                                     sourceNode = treeList.getNodeByKey(e.itemData.c_BM_IDs),
                                     targetNode = visibleRows[e.toIndex].node;
@@ -119,33 +137,118 @@
                                     if (targetNode.data.c_BM_IDs === sourceNode.data.c_BM_IDs) {
                                         e.cancel = true;
                                         break;
-                                    }
+                                    } else {}
+
                                     targetNode = targetNode.parent;
                                 }
                             },
                             onReorder: function(e) {
+                                // 이동이 끝난경우 발생
+                                console.log('onReorder');
+
+                                // sourceData 는 이동한 본인
+                                // targetData 는 이동 되려는 곳, 즉 부모
+
                                 var visibleRows = e.component.getVisibleRows(),
                                     sourceData = e.itemData,
                                     targetData = visibleRows[e.toIndex].data;
 
                                 if (e.dropInsideItem) {
+                                    // 부모가 없다가 있는 경우, 즉 누군가의 하위로 들어가는 경우
                                     e.itemData.c_BM_UpIDs = targetData.c_BM_IDs;
+                                    // UpIDs를 바꿔준다.
                                 } else {
-                                    var sourceIndex = respnse.data.indexOf(sourceData),
-                                        targetIndex = respnse.data.indexOf(targetData);
+                                    // 부모가 있어도 부모가 바뀌는 경우도 동작 함
+                                    var sourceIndex = response.data.indexOf(sourceData),
+                                        targetIndex = response.data.indexOf(targetData);
 
                                     if (sourceData.c_BM_UpIDs !== targetData.c_BM_UpIDs) {
                                         sourceData.c_BM_UpIDs = targetData.c_BM_UpIDs;
                                         if (e.toIndex > e.fromIndex) {
                                             targetIndex++;
-                                        }
-                                    }
+                                        } else {}
+                                    } else {}
 
-                                    respnse.data.splice(sourceIndex, 1);
-                                    respnse.data.splice(targetIndex, 0, sourceData);
+
+                                    response.data.splice(sourceIndex, 1);
+                                    response.data.splice(targetIndex, 0, sourceData);
                                 }
 
-                                e.component.refresh();
+                                // BM_UpIDs 가 해당 내용인걸 파악해본다.
+                                // sourceData.c_BM_UpIDs 가 같은 아이들을 찾는다.
+                                
+                                // 우선 부모를 찾고 그다음에 자식들을 찾아야 하나?
+                                // 그냥 sourceData 가지고 진행해야 하나?
+
+                                // 내용은 좀 더 찾아볼 것
+                                // 위치가 바뀐 내용을 가져옴
+                                var updateArray = response.data.filter(function (n) {
+                                    return n.c_BM_UpIDs == sourceData.c_BM_UpIDs;
+                                });
+
+                                var orderArray = response.data.filter(function (n) {
+                                    return n.c_BM_UpIDs == sourceData.c_BM_UpIDs;
+                                });
+
+                                function customSort(a, b) 
+                                { 
+                                    if(a.c_BM_LoIDs == b.c_BM_LoIDs)
+                                    { 
+                                        return 0;
+                                    } else{}
+
+                                    return a.c_BM_LoIDs < b.c_BM_LoIDs ? 1 : -1; 
+                                } 
+                                
+                                orderArray = orderArray.sort(customSort);
+
+                                // 값 복사 방식이 Value 가 아닌 Reference로 보여짐
+                                // order 한 내역을 다시 세팅한다.
+
+                                var orderComArray = {};
+
+                                for(i=0; i<orderArray.length; i++) {
+                                    orderComArray[i] = orderArray[i].c_BM_LoIDs;
+                                }
+                                
+                                //var updateData = "[";
+
+                                for(i=0; i<updateArray.length; i++) {
+
+                                    console.log("i Data : " + i);
+                                    console.log("Begin Data : " + updateArray[i].c_BM_LoIDs);
+                                    console.log("Update Data : " + orderComArray[i]);
+                                    
+                                    // 값을 바꾸면 orderArray가 이상하게 바뀜
+                                    // 아마 근본 값을 바꾸어서 이렇게 되는것으로 보여짐
+                                    updateArray[i].c_BM_LoIDs = orderComArray[i];
+
+                                    //updateData += "{BM_IDs:" + updateArray[i].c_BM_IDs + ", BM_UpIDs:" +  updateArray[i].c_BM_UpIDs + ", BM_LoIDs:" + orderComArray[i] + "},";
+
+                                    console.log("Complete Data : " + updateArray[i].c_BM_LoIDs);
+                                }
+
+                                //
+                                // updateData = updateData.slice(0,-1);
+                                // updateData += "]";
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/api/updateData',
+                                    data: {data: JSON.stringify(updateArray)},
+                                    //  + '?page=' + pages + '&rowCount=' + rowcounts,
+                                    dataType: "json"
+                                    ,success: function(respnse) {
+                                        RefreshData();
+                                    }
+                                });
+
+                                // treeList.filter("value", "=", sourceData.c_BM_UpIDs);
+                                
+
+                                //var nodes = $("#bm_tree").dxTreeList("instance").
+
+                                //RefreshData();
                             }
                         },
                         parentIdExpr: "c_BM_UpIDs",
@@ -175,20 +278,12 @@
                         selection: {
                             mode: "single" // or "multiple" | "none"
                         },
+                        sorting: {
+                            mode: "none" // or "multiple" | "none"
+                        },
                         autoExpandAll:true,
                         showRowLines: true,
                         showBorders: true,
-                        // DevExtreme DxTreeList는 페이징을 지원하지 않음
-                        // paging: {
-                        //     enabled: true,
-                        //     pageSize: 10,
-                        //     pageIndex: 0    // Shows the second page
-                        // },
-                        // pager: {
-                        //     showPageSizeSelector: true,
-                        //     allowedPageSizes: [10, 20, 50],
-                        //     showNavigationButtons: true
-                        // },
                         columnAutoWidth: true
                     }).dxTreeList("instance");
                     
