@@ -110,68 +110,78 @@ router.post('/addData', function(req, res, next) {
 });
 
 
-router.post('/updateData', function(req, res, next) {
-    try {
+// router.post('/updateData', function(req, res, next) {
+//     try {
 
-        console.log('updateData');
+//         console.log('updateData');
 
-        mssql.connect(config, function (err) {
+//         mssql.connect(config, function (err) {
 
-            console.log('Connect');
-            var request = new mssql.Request();
+//             console.log('Connect');
+//             var request = new mssql.Request();
 
-            console.log(JSON.parse(req.body.data));
-            //console.log(JSON.parse(req.body.data));
+//             console.log(JSON.parse(req.body.data));
+//             //console.log(JSON.parse(req.body.data));
 
-            var updateObj = JSON.parse(req.body.data);
+//             var updateObj = JSON.parse(req.body.data);
 
-            console.log(updateObj.length);
+//             console.log(updateObj.length);
 
-            var queryString = "";
+//             var queryString = "";
+//             console.log('updateObj :', updateObj);
+//             // -- 이전 것과 비교
 
-            // -- 이전 것과 비교
+//             // -- 이걸 프로시저에서 체크해야 하나?
+//             // -- 프로시저에서 체크하는 경우 Error가 발생하거나
+//             // -- 결과를 Return 받아야 한다.
+//             // -- 하지만 여러개를 동작하는 경우이기에 Return 받는것은 맞지 않다.
+//             // -- 에러의 경우도 명확한 에러를 확인해야하는데 이러면 확인할 수 없다.
 
-            // -- 이걸 프로시저에서 체크해야 하나?
-            // -- 프로시저에서 체크하는 경우 Error가 발생하거나
-            // -- 결과를 Return 받아야 한다.
-            // -- 하지만 여러개를 동작하는 경우이기에 Return 받는것은 맞지 않다.
-            // -- 에러의 경우도 명확한 에러를 확인해야하는데 이러면 확인할 수 없다.
+//             // -- 프로시저가 아닌 프로그램에서 진행한다면?
 
-            // -- 프로시저가 아닌 프로그램에서 진행한다면?
+//             // 예외처리는 좀 더 상세 진행하기로 한다.
 
-            // 예외처리는 좀 더 상세 진행하기로 한다.
+//             for(i=0; i<updateObj.length; i++) {
+//                 var selectQueryString = "SELECT * FROM tBM WHERE BM_i = " + updateObj[i].c_BM_IDs;
 
-            for(i=0; i<updateObj.length; i++) {
-                var selectQueryString = "SELECT * FROM tBM WHERE BM_i = " + updateObj[i].c_BM_IDs;
+//                 console.log("Query : " + selectQueryString);
+//                 console.log('아이 :', i);
+//                 //res.render()
+//                 request.query(selectQueryString, function (err, recordset) {
+//                     console.log("BM_i : " + recordset.recordset[0].BM_i);
+//                     console.log('i :',i);
+//                     console.log("org up : " + updateObj[i].orgUpIDs);
+//                     console.log("org lo : " + updateObj[i].orgLoIDs);
+//                 });
+//                 console.log('for I :', i);
+//                 // syncTest(i);
+//                 // console.log('rescordset :', recordset);
+//                 if(recordset.recordset[0].BM_UpIDs == updateObj[i].orgUpIDs && recordset.recordset[0].BM_LoIDs == updateObj[i].orgLoIDs) {
+//                     queryString += "UPDATE tBM SET BM_UpIDs = " + updateObj[i].c_BM_UpIDs + ", BM_LoIDs = " + updateObj[i].c_BM_LoIDs 
+//                     queryString += " WHERE BM_i = " + updateObj[i].c_BM_IDs
+//                     queryString += ";";
+//                 } else {
+//                     res.json({data : 'Error'} );
+//                     return;
+//                 }
+//             }
 
-                console.log("Query : " + selectQueryString);
+//             // function syncTest(length){
+//             //     request.query(selectQueryString, function (err, recordset) {
+//             //         console.log("BM_i : " + recordset.recordset[0].BM_i);
+//             //         console.log('i :',length);
+//             //         console.log("org up : " + updateObj[length].orgUpIDs);
+//             //         console.log("org lo : " + updateObj[length].orgLoIDs);
+//             //     });
+//             // }
 
-                //res.render()
-                request.query(selectQueryString, function (err, recordset) {
-                    console.log("BM_i : " + recordset.recordset[0].BM_i);
-                    
-                    console.log("org up : " + updateObj[i].orgUpIDs);
-                    console.log("org lo : " + updateObj[i].orgLoIDs);
-                });
-
-
-                // if(recordset.recordset[0].BM_UpIDs == updateObj[i].orgUpIDs && recordset.recordset[0].BM_LoIDs == updateObj[i].orgLoIDs) {
-                //     queryString += "UPDATE tBM SET BM_UpIDs = " + updateObj[i].c_BM_UpIDs + ", BM_LoIDs = " + updateObj[i].c_BM_LoIDs 
-                //     queryString += " WHERE BM_i = " + updateObj[i].c_BM_IDs
-                //     queryString += ";";
-                // } else {
-                //     res.json({data : 'Error'} );
-                //     return;
-                // }
-            }
-
-            request.query(queryString, function (err, recordset) {
+            // request.query(queryString, function (err, recordset) {
         
-                //console.log(recordset.recordset)
-                //res.render()
+            //     //console.log(recordset.recordset)
+            //     //res.render()
                 
-                res.json({data : 'OK'} );
-            });
+            //     res.json({data : 'OK'} );
+            // });
 
             // request.input('p_Parameter', sql.NVARCHAR(sql.MAX), '|||ExecTy       ===gvvA|||E_IDs        ===E0000001|||asas         ===  |||');
         
@@ -181,14 +191,14 @@ router.post('/updateData', function(req, res, next) {
             //         { data : recordsets }
             //     );
             // });
-        });
-    } catch (err) {
-        alert(err);
-        //console.log('error fire')
-    }
-    // res.render('index', { title: 'Express' });
+//         });
+//     } catch (err) {
+//         alert(err);
+//         //console.log('error fire')
+//     }
+//     // res.render('index', { title: 'Express' });
 
-});
+// });
 
 //데이터 불러오기
 router.get('/board', async function(req, res){
@@ -278,6 +288,52 @@ router.put('/board/:urlParam', async function (req, res, next) {
         console.log(err);
         console.log('error fire')
     }
+});
+
+router.post('/updateData', async function(req, res, next) {
+    try {
+
+        console.log('updateData');
+
+        let pool = await mssql.connect(config)
+
+        console.log(JSON.parse(req.body.data));
+        //console.log(JSON.parse(req.body.data));
+
+        var updateObj = JSON.parse(req.body.data);
+
+        var queryString = "";
+
+        for(i=0; i<updateObj.length; i++) {
+            var selectQueryString = "SELECT * FROM tBM WHERE BM_i = " + updateObj[i].c_BM_IDs;
+
+            console.log("Query : " + selectQueryString);
+            console.log('아이 :', i);
+            //res.render()
+            let result = await pool.query(selectQueryString)
+                console.log('I : :', i);
+                console.log("BM_i : " + result.recordset[0].BM_i);
+                console.log("org up : " + updateObj[i].orgUpIDs);
+                console.log("org lo : " + updateObj[i].orgLoIDs);
+
+            if(result.recordset[0].BM_UpIDs == updateObj[i].orgUpIDs && result.recordset[0].BM_LoIDs == updateObj[i].orgLoIDs) {
+                queryString += "UPDATE tBM SET BM_UpIDs = " + updateObj[i].c_BM_UpIDs + ", BM_LoIDs = " + updateObj[i].c_BM_LoIDs 
+                queryString += " WHERE BM_i = " + updateObj[i].c_BM_IDs
+                queryString += ";";
+                console.log('queryString :', queryString);
+            } else {
+                res.json({data : 'Error'} );
+                return;
+            }
+        }
+
+        
+    } catch (err) {
+        // alert(err);
+        console.log('error fire',err)
+    }
+    // res.render('index', { title: 'Express' });
+
 });
 
 //데이터 삭제
