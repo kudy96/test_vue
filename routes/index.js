@@ -6,13 +6,8 @@ const mssql = require('mssql');
 
 
 router.get('/', function(req, res, next) {
-    res.render('test', { title: 'Express' });
+    res.render('index', { title: 'Express' });
 });
-
-router.get('/test',function(req,res,next){
-    console.log('good');
-    res.render('test');
-})
 
 router.get('/editor',function(req,res,next){
     console.log('good');
@@ -22,6 +17,11 @@ router.get('/editor',function(req,res,next){
 router.get('/ckeditor',function(req,res,next){
     console.log('ckeditor!');
     res.render('ckeditor');
+})
+
+router.get('/board',function(req,res){
+    console.log('goood');
+    res.render('../vue/src/App.vue');
 })
 
 router.post('/api/SaveDocument', function (req, res) {

@@ -61,6 +61,7 @@
 
             <div id="btnNew" class="validate"></div>
             <div id="btnChildNew" class="validate"></div>
+            <div id="btnVue" class="validate"></div>
 
             <div class="options"></div>
             
@@ -372,6 +373,15 @@
                     //alert(upIds);
 
                     // var tree = $("#bm_tree").dxTreeList("instance");  
+                }
+            });
+
+            $("#btnVue").dxButton({
+                text: "Vue로 이동하기",
+                type: "default",
+                onClick: function (e) {
+
+                    location.href= '/';
                 }
             });
 

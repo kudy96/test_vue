@@ -369,4 +369,8 @@ router.put('/board/:urlParam', async function (req, res, next) {
     }
 });
 
-module.exports = router;
+router.get('/govue', function(req, res, next) {
+    res.redirect('/drag')
+});
+
+module.exports = router
